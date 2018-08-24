@@ -1,8 +1,8 @@
 package com.rohit.lpregister.activity;
 
+import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,8 +13,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.rohit.lpregister.utils.InputValidation;
 import com.rohit.lpregister.R;
+import com.rohit.lpregister.utils.InputValidation;
 
 import java.util.Objects;
 
@@ -121,6 +121,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 break;
 
             case R.id.imageView:
+
                 break;
         }
 
