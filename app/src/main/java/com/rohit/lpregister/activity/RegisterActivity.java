@@ -1,8 +1,16 @@
 package com.rohit.lpregister.activity;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,11 +23,19 @@ import android.widget.Toast;
 
 import com.rohit.lpregister.R;
 import com.rohit.lpregister.utils.InputValidation;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.Objects;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener,
         RadioGroup.OnCheckedChangeListener{
+
+
+    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1001;
+
 
     private EditText mEditTextFirstName,mEditTextLastName,mEditTextEmail,mEditTextMobile,mEditTextDob;
 
@@ -30,7 +46,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private TextView mTextViewAlreadyMember;
 
     // ImageView Instance Variable
-    private ImageView mImageViewCandidateImage;
+    private CircleImageView mImageViewCandidateImage;
 
     // RadioGroup object Declaration.
     private RadioGroup mRadioGroupGender;
@@ -49,7 +65,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-         initView(); // initView() method call
+        initView(); // initView() method call
 
         clickListener(); // clickListener(); method call
 
@@ -59,7 +75,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     /**
      * clickListener() method definition
-      */
+     */
 
     private void clickListener() {
 
@@ -89,11 +105,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         mTextViewAlreadyMember = findViewById(R.id.textView_already_member);
 
-        mImageViewCandidateImage = findViewById(R.id.imageView);
+        mImageViewCandidateImage = findViewById(R.id.imageview);
 
         mRadioGroupGender = findViewById(R.id.radioGroupP_gender);
 
         mRelativeLayout = findViewById(R.id.relative_layout);
+
 
     }
 
@@ -104,7 +121,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     /**
      * OnClick() method implementation
-      * @param view as a parameter
+     * @param view as a parameter
      */
     @Override
     public void onClick(View view) {
@@ -120,8 +137,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             case R.id.textView_already_member:
                 break;
 
-            case R.id.imageView:
-
+            case R.id.imageview:
+                checkPermissions();
                 break;
         }
 
@@ -129,7 +146,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     /**
      * getData() method definition
-      */
+     */
     public void getData(){
 
         StringBuilder sb = new StringBuilder();
@@ -222,9 +239,105 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
 
 
-               getData();   //getData() method call
+        getData();   //getData() method call
 
 
     }
+
+    /**
+     * method to initiate request for permissions.
+     */
+
+    private void checkPermissions() {
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+
+            // requesting for the permission again
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+
+        } else {
+            // No explanation needed; request the permission
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+
+            // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+            // app-defined int constant. The callback method gets the
+            // result of the request.
+        }
+    }
+
+
+    /**
+     * Handle the permission result.
+     * @param requestCode permission request code
+     * @param permissions number of permission requested
+     * @param grantResults permission granted or not
+     */
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+//                    Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+
+
+                    // Starting the cropping activity
+                    CropImage.activity()
+                            .setGuidelines(CropImageView.Guidelines.ON)
+                            .start(RegisterActivity.this);
+
+                } else {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+//                        showStoragePermissionRationale();
+                        //should provide the explanation for the permission
+                    } else {
+                        Toast.makeText(this, "Should grant permission", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            // other permission
+
+        }
+    }
+
+
+    /**
+     * method to handle image result
+     * @param requestCode image request code
+     * @param resultCode result status
+     * @param data intent data
+     */
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+
+                // setting the image to imageView
+                mImageViewCandidateImage.setImageURI(resultUri);
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+//                Log.d(TAG, "onActivityResult: " + error);
+            }
+        }
+    }
+
 
 }

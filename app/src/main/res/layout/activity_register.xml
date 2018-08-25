@@ -20,13 +20,23 @@
             android:id="@+id/linearLayoutCompat"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:layout_width="@dimen/dimen_100dp"
-                android:layout_height="@dimen/dimen_100dp"
+            <!--<ImageView-->
+                <!--android:layout_width="@dimen/dimen_100dp"-->
+                <!--android:layout_height="@dimen/dimen_100dp"-->
+                <!--android:layout_gravity="center"-->
+                <!--android:src="@mipmap/ic_launcher_round"-->
+                <!--android:id="@+id/imageView"-->
+                <!--tools:ignore="ContentDescription" />-->
+
+            <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/imageview"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentTop="true"
                 android:layout_gravity="center"
-                android:src="@mipmap/ic_launcher_round"
-                android:id="@+id/imageView"
-                tools:ignore="ContentDescription" />
+                android:src="@drawable/ic_launcher_foreground"
+                app:civ_border_color="#FF000000"
+                app:civ_border_width="2dp" />
 
             <TextView
                 android:layout_width="wrap_content"
